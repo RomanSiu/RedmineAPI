@@ -24,8 +24,8 @@ except Exception as e:
     exit()
 
 
-def get_issues_by_query(contract_num: str = None, project_stage: int = None,
-                        time_from: str = None, time_to: str = None):
+async def get_issues_by_query(contract_num: str = None, project_stage: int = None,
+                              time_from: str = None, time_to: str = None):
     filter_kwargs = {}
     start_date = datetime(year=1970, month=1, day=1).date()
     if contract_num:
@@ -34,9 +34,9 @@ def get_issues_by_query(contract_num: str = None, project_stage: int = None,
         filter_kwargs['cf_18'] = project_stage
     if time_from or time_to:
         if time_from:
-            time_from = datetime.strptime(time_from, '%d.%m.%Y').date()
+            time_from = datetime.strptime(time_from, '%Y-%m-%d').date()
         if time_to:
-            time_to = datetime.strptime(time_to, '%d.%m.%Y').date()
+            time_to = datetime.strptime(time_to, '%Y-%m-%d').date()
         filter_kwargs['start_date'] = f"><{time_from if time_from else start_date}|{time_to if time_to else ''}"
 
     if filter_kwargs:
@@ -69,10 +69,12 @@ def get_user_hours(issues) -> dict:
     return user_burned_hours_dict
 
 
-def get_burned_hours(**kwargs):
-    issues = get_issues_by_query(time_from='16.12.2024', time_to='18.12.2024')
+async def get_burned_hours(**kwargs):
+    issues = await get_issues_by_query(**kwargs)
     user_burned_hours = get_user_hours(issues)
-    print(user_burned_hours)
+    for name, hours in user_burned_hours.items():
+        user_burned_hours[name] = "{:.1f}".format(hours)
+    return user_burned_hours
 
 
 if __name__ == '__main__':
