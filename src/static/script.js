@@ -59,5 +59,5 @@ document.getElementById('searchForm').addEventListener('submit', async function 
 
 // Завантаження Excel
 document.getElementById('downloadExcel').addEventListener('click', function () {
-  window.location.href = 'http://127.0.0.1:8000/api/download_excel';
+  window.location.href = 'http://127.0.0.1:8000/api/redmine/download_excel';
 });

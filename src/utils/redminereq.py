@@ -4,6 +4,7 @@ from datetime import datetime
 from collections import defaultdict
 
 from dotenv import load_dotenv
+from openpyxl import Workbook
 from redminelib import Redmine
 from redminelib.exceptions import ResourceAttrError
 
@@ -69,13 +70,29 @@ def get_user_hours(issues) -> dict:
     return user_burned_hours_dict
 
 
+def create_xlsx_file(user_dict: dict) -> None:
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Burned Hours Per Project"
+    ws.append(["Name", "Burned Hours"])
+    for user_name, user_hours in user_dict.items():
+        ws.append([user_name, user_hours])
+    output_file = r"src\xlsx_files\burned_hours_per_worker.xlsx"
+    try:
+        wb.save(output_file)
+        print(f"Burned hours data saved to {output_file}")
+    except Exception as e:
+        print(f"Failed to save Excel file: {e}")
+
+
 async def get_burned_hours(**kwargs):
     issues = await get_issues_by_query(**kwargs)
     user_burned_hours = get_user_hours(issues)
     for name, hours in user_burned_hours.items():
         user_burned_hours[name] = "{:.1f}".format(hours)
+    create_xlsx_file(user_burned_hours)
     return user_burned_hours
 
 
 if __name__ == '__main__':
-    get_burned_hours()
+    get_burned_hours(time_from='2024-12-12', time_to='2024-12-14')
