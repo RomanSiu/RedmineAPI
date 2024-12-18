@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from src.utils.redminereq import get_burned_hours
 
-router = APIRouter(prefix="/api", tags=["api"])
+router = APIRouter(prefix="/redmine", tags=["redmine"])
 
 
 @router.get("/burned_hours")

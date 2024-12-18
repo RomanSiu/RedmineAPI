@@ -10,7 +10,7 @@ from src.routes.redmine_request import router as redmine_request_router
 
 app = FastAPI()
 
-app.include_router(redmine_request_router, prefix="/redmine")
+app.include_router(redmine_request_router, prefix="/api")
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 app.add_middleware(
