@@ -15,7 +15,7 @@ document.getElementById('searchForm').addEventListener('submit', async function 
   if (timeFrom) queryParams.append('time_from', timeFrom);
   if (timeTo) queryParams.append('time_to', timeTo);
 
-  const url = `http://127.0.0.1:8000/api/redmine/burned_hours?${queryParams.toString()}`;
+  const url = `http://172.16.2.13:8000/api/redmine/burned_hours?${queryParams.toString()}`;
 
   // Ховаємо таблицю перед новим запитом
   document.getElementById('resultsSection').classList.add('hidden');
@@ -59,5 +59,5 @@ document.getElementById('searchForm').addEventListener('submit', async function 
 
 // Завантаження Excel
 document.getElementById('downloadExcel').addEventListener('click', function () {
-  window.location.href = 'http://127.0.0.1:8000/api/redmine/download_excel';
+  window.location.href = 'http://172.16.2.13:8000/api/redmine/download_excel';
 });
