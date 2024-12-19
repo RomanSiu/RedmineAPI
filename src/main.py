@@ -6,9 +6,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.routes.redmine_request import router as redmine_request_router
+from logger import logger
 
 
 app = FastAPI()
+logger.info('Starting RedmineAPI')
 
 app.include_router(redmine_request_router, prefix="/api")
 app.mount("/static", StaticFiles(directory="src/static"), name="static")

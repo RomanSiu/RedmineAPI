@@ -8,6 +8,8 @@ from openpyxl import Workbook
 from redminelib import Redmine
 from redminelib.exceptions import ResourceAttrError
 
+from src.logger import logger
+
 # Suppress SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -19,10 +21,23 @@ API_KEY = os.getenv('API_KEY')
 # Connect to Redmine
 try:
     redmine = Redmine(REDMINE_URL, key=API_KEY, requests={'verify': False})
-    print("Connected to Redmine successfully.")
+    logger.info('Redmine connected successfully')
 except Exception as e:
-    print(f"Failed to connect to Redmine: {e}")
+    logger.error(f"Failed to connect to Redmine: {e}")
     exit()
+
+
+def logging_func(func):
+    def inner(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+        except Exception as e:
+            result = None
+            logger.error(f"Failed to run {func.__name__}: {e}")
+        else:
+            return result
+        return result
+    return inner
 
 
 async def get_issues_by_query(contract_num: str = None, project_stage: int = None,
@@ -47,6 +62,7 @@ async def get_issues_by_query(contract_num: str = None, project_stage: int = Non
     return issues
 
 
+@logging_func
 def get_user_name(issue) -> str | None:
     try:
         user_name = issue.assigned_to.name
@@ -80,9 +96,8 @@ def create_xlsx_file(user_dict: dict) -> None:
     output_file = r"src\xlsx_files\burned_hours_per_worker.xlsx"
     try:
         wb.save(output_file)
-        print(f"Burned hours data saved to {output_file}")
     except Exception as e:
-        print(f"Failed to save Excel file: {e}")
+        logger.error(f"Failed to save xlsx file: {e}")
 
 
 async def get_burned_hours(**kwargs):
@@ -96,3 +111,4 @@ async def get_burned_hours(**kwargs):
 
 if __name__ == '__main__':
     get_burned_hours(time_from='2024-12-12', time_to='2024-12-14')
+    # 24002-ПФУ (підтримка)  24005-ПФУ (модернізація)

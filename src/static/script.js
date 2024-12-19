@@ -2,7 +2,7 @@ document.getElementById('searchForm').addEventListener('submit', async function 
   e.preventDefault();
 
   // Збираємо дані форми
-  const contractNumber = document.getElementById('contractNumber').value.trim();
+  const contractNum = document.getElementById('contractNum').value.trim();
   const projectStage = document.getElementById('projectStage').value.trim();
   const timeFrom = document.getElementById('timeFrom').value.trim();
   const timeTo = document.getElementById('timeTo').value.trim();
@@ -10,7 +10,7 @@ document.getElementById('searchForm').addEventListener('submit', async function 
   // Формуємо URL з параметрами
   const queryParams = new URLSearchParams();
 
-  if (contractNumber) queryParams.append('contract_number', contractNumber);
+  if (contractNum) queryParams.append('contract_num', contractNum);
   if (projectStage) queryParams.append('project_stage', projectStage);
   if (timeFrom) queryParams.append('time_from', timeFrom);
   if (timeTo) queryParams.append('time_to', timeTo);
