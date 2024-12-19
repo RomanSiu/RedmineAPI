@@ -40,13 +40,17 @@ def logging_func(func):
     return inner
 
 
-async def get_issues_by_query(contract_num: str = None, project_stage: int = None,
+async def get_issues_by_query(contract_num: str = None, project_stage: str | int = None,
                               time_from: str = None, time_to: str = None):
     filter_kwargs = {}
     start_date = datetime(year=1970, month=1, day=1).date()
     if contract_num:
         filter_kwargs['cf_13'] = contract_num
     if project_stage:
+        try:
+            project_stage = int(project_stage)
+        except ValueError:
+            pass
         filter_kwargs['cf_18'] = project_stage
     if time_from or time_to:
         if time_from:
