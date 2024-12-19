@@ -93,7 +93,7 @@ def create_xlsx_file(user_dict: dict) -> None:
     ws.append(["Name", "Burned Hours"])
     for user_name, user_hours in user_dict.items():
         ws.append([user_name, user_hours])
-    output_file = r"src\xlsx_files\burned_hours_per_worker.xlsx"
+    output_file = r"src/xlsx_files/burned_hours_per_worker.xlsx"
     try:
         wb.save(output_file)
     except Exception as e:
