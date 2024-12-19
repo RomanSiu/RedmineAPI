@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.routes.redmine_request import router as redmine_request_router
+from routes.redmine_request import router as redmine_request_router
 from logger import logger
 
 

@@ -8,7 +8,7 @@ from openpyxl import Workbook
 from redminelib import Redmine
 from redminelib.exceptions import ResourceAttrError
 
-from src.logger import logger
+from logger import logger
 
 # Suppress SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
 
-from src.utils.redminereq import get_burned_hours
+from utils.redminereq import get_burned_hours
 
 router = APIRouter(prefix="/redmine", tags=["redmine"])
 
