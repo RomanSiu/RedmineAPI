@@ -85,7 +85,10 @@ def get_user_hours(issues) -> dict:
         user_name = get_user_name(issue)
         if not user_name:
             continue
-        user_hours = issue.spent_hours
+        try:
+            user_hours = issue.spent_hours
+        except ResourceAttrError:
+            user_hours = 0.0
         user_burned_hours_dict[user_name] += user_hours
     return user_burned_hours_dict
 
