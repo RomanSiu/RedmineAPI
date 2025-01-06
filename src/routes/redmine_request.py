@@ -10,9 +10,9 @@ router = APIRouter(prefix="/redmine", tags=["redmine"])
 FILE_PATH = Path("src/xlsx_files/Issues info.xlsx")
 
 
-@router.get("/burned_hours")
-async def burned_hours(contract_num: str = None, project_stage: str | int = None,
-                       time_from: str = None, time_to: str = None):
+@router.get("/issues_info")
+async def issues_info(contract_num: str = None, project_stage: str | int = None,
+                      time_from: str = None, time_to: str = None):
     await get_issues_info(contract_num=contract_num, project_stage=project_stage,
                           time_from=time_from, time_to=time_to)
     return FileResponse(
