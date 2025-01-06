@@ -18,6 +18,17 @@ load_dotenv()
 REDMINE_URL = os.getenv('REDMINE_URL')
 API_KEY = os.getenv('API_KEY')
 
+
+requests_dict = {'name': "issue.assigned_to.name", 'user_id': "issue.assigned_to.id",
+                 'project_name': "issue.project.name", 'project_id': "issue.project.id",
+                 'version': "issue.fixed_version.name",
+                 'issue_id': "issue.id", 'issue_tracker': "issue.tracker.name", 'issue_subject': "issue.subject",
+                 'done_ratio': "issue.done_ratio",
+                 'status': "issue.status.name", 'planned_hours': "issue.estimated_hours",
+                 'real_hours': "issue.spent_hours"}
+
+date_request = {'start_date': "issue.start_date", 'end_date': "issue.due_date"}
+
 # Connect to Redmine
 try:
     redmine = Redmine(REDMINE_URL, key=API_KEY, requests={'verify': False})
@@ -93,14 +104,35 @@ def get_user_hours(issues) -> dict:
     return user_burned_hours_dict
 
 
-def create_xlsx_file(user_dict: dict) -> None:
+# def create_xlsx_file(user_dict: dict) -> None:
+#     wb = Workbook()
+#     ws = wb.active
+#     ws.title = "Burned Hours Per Project"
+#     ws.append(["Name", "Burned Hours"])
+#     for user_name, user_hours in user_dict.items():
+#         ws.append([user_name, user_hours])
+#     output_file = r"src/xlsx_files/burned_hours_per_worker.xlsx"
+#     try:
+#         wb.save(output_file)
+#     except Exception as e:
+#         logger.error(f"Failed to save xlsx file: {e}")
+
+
+def create_xlsx_file(issues_list: list) -> None:
     wb = Workbook()
     ws = wb.active
-    ws.title = "Burned Hours Per Project"
-    ws.append(["Name", "Burned Hours"])
-    for user_name, user_hours in user_dict.items():
-        ws.append([user_name, user_hours])
-    output_file = r"src/xlsx_files/burned_hours_per_worker.xlsx"
+    ws.title = "Issues info"
+    ws.append(['ПІБ', 'Ідентифікатор спеціаліста', 'Проект', 'Ідентифікатор проекта', 'Договір', 'Етап', 'Версія',
+               'Версія ПО', 'Номер задачі', 'Трекер', 'Тема', 'Специфіка задачі', 'Дата початку', 'Дата завершення',
+               'Готовність', 'Діяльність', 'Планові працевитрати', 'Фактичні працевитрати'])
+    for issue in issues_list:
+        ws.append([issue['name'], issue['user_id'],
+                   issue['project_name'], issue['project_id'], issue['contract'], issue['stage'],
+                   issue['version'], issue['software_version'],
+                   issue['issue_id'], issue['issue_tracker'], issue['issue_subject'], '',
+                   issue['start_date'], issue['end_date'], issue['done_ratio'],
+                   issue['status'], issue['planned_hours'], issue['real_hours']])
+    output_file = r"src/xlsx_files/Issues info.xlsx"
     try:
         wb.save(output_file)
     except Exception as e:
@@ -116,6 +148,40 @@ async def get_burned_hours(**kwargs):
     return user_burned_hours
 
 
+def get_info(issues) -> list:
+    issues_info = []
+    for issue in issues:
+        issue_dict = {}
+        for key, value in requests_dict.items():
+            try:
+                issue_dict[key] = eval(value)
+            except ResourceAttrError:
+                issue_dict[key] = None
+        for key, value in date_request.items():
+            try:
+                date = eval(value)
+                if date:
+                    issue_dict[key] = date.strftime("%d-%m-%Y")
+                else:
+                    issue_dict[key] = None
+            except ResourceAttrError:
+                issue_dict[key] = None
+        for field_id, name in {13: 'contract', 16: 'software_version', 18: 'stage'}.items():
+            try:
+                issue_dict[name] = issue.custom_fields.get(field_id).value
+            except (ResourceAttrError, AttributeError):
+                issue_dict[name] = None
+
+        issues_info.append(issue_dict)
+    return issues_info
+
+
+async def get_issues_info(**kwargs):
+    issues = await get_issues_by_query(**kwargs)
+    issues_info = get_info(issues)
+    create_xlsx_file(issues_info)
+
+
 if __name__ == '__main__':
-    get_burned_hours(time_from='2024-12-12', time_to='2024-12-14')
+    get_issues_info(time_from='2024-12-12', time_to='2024-12-14')
     # 24002-ПФУ (підтримка)  24005-ПФУ (модернізація)
