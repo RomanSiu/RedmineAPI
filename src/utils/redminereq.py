@@ -53,7 +53,7 @@ def logging_func(func):
 
 async def get_issues_by_query(contract_num: str = None, project_stage: str | int = None,
                               time_from: str = None, time_to: str = None):
-    filter_kwargs = {}
+    filter_kwargs = {'status_id': '*'}
     start_date = datetime(year=1970, month=1, day=1).date()
     if contract_num:
         filter_kwargs['project_id'] = contract_num
