@@ -6,7 +6,7 @@ from collections import defaultdict
 from dotenv import load_dotenv
 from openpyxl import Workbook
 from redminelib import Redmine
-from redminelib.exceptions import ResourceAttrError
+from redminelib.exceptions import ResourceAttrError, ResourceNotFoundError
 
 from logger import logger
 
@@ -56,7 +56,7 @@ async def get_issues_by_query(contract_num: str = None, project_stage: str | int
     filter_kwargs = {}
     start_date = datetime(year=1970, month=1, day=1).date()
     if contract_num:
-        filter_kwargs['cf_13'] = contract_num
+        filter_kwargs['project_id'] = contract_num
     if project_stage:
         try:
             project_stage = int(project_stage)
@@ -178,8 +178,12 @@ def get_info(issues) -> list:
 
 async def get_issues_info(**kwargs):
     issues = await get_issues_by_query(**kwargs)
-    issues_info = get_info(issues)
-    create_xlsx_file(issues_info)
+    try:
+        issues_info = get_info(issues)
+        create_xlsx_file(issues_info)
+        return {'message': 'Issues info saved successfully'}
+    except ResourceNotFoundError:
+        return {'message': 'Issues not found'}
 
 
 if __name__ == '__main__':
