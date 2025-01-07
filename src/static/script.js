@@ -29,6 +29,12 @@ document.getElementById('searchForm').addEventListener('submit', async function 
 
     const data = await response.json();
 
+    // Перевірка на наявність повідомлення "Issues not found"
+    if (data.message === 'Issues not found') {
+      alert('За вашим запитом не знайдено записів.');
+      return;
+    }
+
     // Перевіряємо, чи є результати
     if (Object.keys(data).length > 0) {
       alert('Дані успішно отримані. Ви можете завантажити їх у вигляді Excel.');
