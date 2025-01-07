@@ -1,6 +1,8 @@
 document.getElementById('searchForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
+  document.getElementById('resultsSection').classList.add('hidden');
+
   // Збираємо дані форми
   const contractNum = document.getElementById('contractNum').value.trim();
   const projectStage = document.getElementById('projectStage').value.trim();

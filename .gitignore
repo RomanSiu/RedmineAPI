@@ -1,3 +1,5 @@
 .idea
 .env
-burned_hours_per_worker.xlcx
+Issues info.xlsx
+logs.log
+test*
