@@ -15,11 +15,7 @@ document.getElementById('searchForm').addEventListener('submit', async function 
   if (timeFrom) queryParams.append('time_from', timeFrom);
   if (timeTo) queryParams.append('time_to', timeTo);
 
-  const url = `http://172.16.2.13:8000/api/redmine/burned_hours?${queryParams.toString()}`;
-
-  // Ховаємо таблицю перед новим запитом
-  document.getElementById('resultsSection').classList.add('hidden');
-  document.getElementById('downloadExcel').style.display = 'none';
+  const url = `http://172.16.2.13:8000/api/redmine/issues_info?${queryParams.toString()}`;
 
   try {
     // Виконуємо GET-запит
@@ -29,28 +25,17 @@ document.getElementById('searchForm').addEventListener('submit', async function 
 
     if (!response.ok) throw new Error('Помилка отримання даних.');
 
-    const data = await response.json(); // Очікуємо словник {ім'я: години}
-
-    // Очищуємо таблицю
-    const tableBody = document.querySelector('#resultsTable tbody');
-    tableBody.innerHTML = '';
+    const data = await response.json();
 
     // Перевіряємо, чи є результати
-    const keys = Object.keys(data); // Отримуємо імена співробітників
-    if (keys.length > 0) {
-      // Заповнюємо таблицю
-      keys.forEach(name => {
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `<td>${name}</td><td>${data[name]}</td>`;
-        tableBody.appendChild(newRow);
-      });
-
-      // Відображаємо таблицю та кнопку для завантаження Excel
-      document.getElementById('resultsSection').classList.remove('hidden');
-      document.getElementById('downloadExcel').style.display = 'block';
+    if (Object.keys(data).length > 0) {
+      alert('Дані успішно отримані. Ви можете завантажити їх у вигляді Excel.');
     } else {
       alert('Результатів не знайдено.');
     }
+
+    // Відображаємо кнопку для завантаження Excel
+    document.getElementById('resultsSection').classList.remove('hidden');
 
   } catch (error) {
     alert('Сталася помилка: ' + error.message);
