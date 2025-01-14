@@ -68,7 +68,7 @@ async def get_issues_by_query(contract_num: str = None, project_stage: str | int
             time_from = datetime.strptime(time_from, '%Y-%m-%d').date()
         if time_to:
             time_to = datetime.strptime(time_to, '%Y-%m-%d').date()
-        filter_kwargs['start_date'] = f"><{time_from if time_from else start_date}|{time_to if time_to else ''}"
+        filter_kwargs['updated_on'] = f"><{time_from if time_from else start_date}|{time_to if time_to else ''}"
 
     if filter_kwargs:
         issues = redmine.issue.filter(**filter_kwargs)
