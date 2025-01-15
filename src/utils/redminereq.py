@@ -153,16 +153,14 @@ def get_info(issues, time_from, time_to) -> list:
         time_entries_data = get_time_entries(issue, time_from, time_to)
 
         if time_entries_data:
-            for val in time_entries_data.values():
+            for val in time_entries_data:
                 issue_dict.update(val)
-                print(issue_dict)
                 issues_info.append(issue_dict.copy())
         else:
             issue_dict['name'] = issue.assigned_to.name
             issue_dict['user_id'] = issue.assigned_to.id
             issue_dict['real_hours'] = issue.spent_hours
             issues_info.append(issue_dict)
-    print(issues_info)
     return issues_info
 
 
@@ -170,19 +168,24 @@ def get_time_entries(issue, time_from, time_to):
     if not time_to:
         time_to = datetime.now().date()
 
-    time_entries_data_dict = {}
+    time_entries_data_dict = []
     time_entries = issue.time_entries
 
     for time_entry in time_entries:
         if time_from <= time_entry.created_on.date() <= time_to:
+            time_entries_data = {}
             name, user_id = time_entry.user.name, time_entry.user.id
-            if name not in time_entries_data_dict:
-                time_entries_data_dict[name] = {'real_hours': 0}
-            time_entries_data = time_entries_data_dict[name]
             time_entries_data['name'] = name
             time_entries_data['user_id'] = user_id
-            time_entries_data['real_hours'] += time_entry.hours
-            time_entries_data_dict[name] = time_entries_data
+            time_entries_data['real_hours'] = time_entry.hours
+            time_entries_data_dict.append(time_entries_data)
+            # if name not in time_entries_data_dict:
+            #     time_entries_data_dict[name] = {'real_hours': 0}
+            # time_entries_data = time_entries_data_dict[name]
+            # time_entries_data['name'] = name
+            # time_entries_data['user_id'] = user_id
+            # time_entries_data['real_hours'] += time_entry.hours
+            # time_entries_data_dict[name] = time_entries_data
 
     return time_entries_data_dict
 
