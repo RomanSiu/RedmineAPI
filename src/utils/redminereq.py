@@ -1,5 +1,6 @@
 import os
 import urllib3
+import json
 from datetime import datetime
 from collections import defaultdict
 
@@ -7,8 +8,6 @@ from dotenv import load_dotenv
 from openpyxl import Workbook
 from redminelib import Redmine
 from redminelib.exceptions import ResourceAttrError, ResourceNotFoundError
-
-from logger import logger
 
 # Suppress SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -24,14 +23,11 @@ requests_dict = {'project_name': "issue.project.name", 'project_id': "issue.proj
                  'done_ratio': "issue.done_ratio",
                  'status': "issue.status.name", 'planned_hours': "issue.estimated_hours"}
 
-date_request = {'start_date': "issue.start_date", 'end_date': "issue.due_date"}
-
 # Connect to Redmine
 try:
     redmine = Redmine(REDMINE_URL, key=API_KEY, requests={'verify': False})
-    logger.info('Redmine connected successfully')
 except Exception as e:
-    logger.error(f"Failed to connect to Redmine: {e}")
+    print(f"Failed to connect to Redmine: {e}")
     exit()
 
 
@@ -41,7 +37,6 @@ def logging_func(func):
             result = func(*args, **kwargs)
         except Exception as e:
             result = None
-            logger.error(f"Failed to run {func.__name__}: {e}")
         else:
             return result
         return result
@@ -67,33 +62,6 @@ async def get_issues_by_query(time_from, time_to, contract_num: str = None, proj
     return issues
 
 
-@logging_func
-def get_user_name(issue) -> str | None:
-    try:
-        user_name = issue.assigned_to.name
-    except ResourceAttrError:
-        try:
-            parent_issue = redmine.issue.get(issue.parent)
-        except ResourceAttrError:
-            return None
-        user_name = get_user_name(parent_issue)
-    return user_name
-
-
-def get_user_hours(issues) -> dict:
-    user_burned_hours_dict = defaultdict(int)
-    for issue in issues:
-        user_name = get_user_name(issue)
-        if not user_name:
-            continue
-        try:
-            user_hours = issue.spent_hours
-        except ResourceAttrError:
-            user_hours = 0.0
-        user_burned_hours_dict[user_name] += user_hours
-    return user_burned_hours_dict
-
-
 def create_xlsx_file(issues_list: list) -> None:
     wb = Workbook()
     ws = wb.active
@@ -112,16 +80,16 @@ def create_xlsx_file(issues_list: list) -> None:
     try:
         wb.save(output_file)
     except Exception as e:
-        logger.error(f"Failed to save xlsx file: {e}")
+        print(f"Failed to save xlsx file: {e}")
 
 
-async def get_burned_hours(**kwargs):
-    issues = await get_issues_by_query(**kwargs)
-    user_burned_hours = get_user_hours(issues)
-    for name, hours in user_burned_hours.items():
-        user_burned_hours[name] = "{:.1f}".format(hours)
-    create_xlsx_file(user_burned_hours)
-    return user_burned_hours
+def create_json_file(issues_list: list) -> None:
+    try:
+        os.remove(r"src/xlsx_files/Issues info.json")
+    except FileNotFoundError:
+        ...
+    with open(r"src/xlsx_files/Issues info.json", 'w', encoding='utf-8') as f:
+        json.dump(issues_list, f, ensure_ascii=False, indent=4)
 
 
 def get_info(issues, time_from, time_to) -> list:
@@ -134,21 +102,8 @@ def get_info(issues, time_from, time_to) -> list:
             except ResourceAttrError:
                 issue_dict[key] = None
 
-        for key, value in date_request.items():
-            try:
-                date = eval(value)
-                if date:
-                    issue_dict[key] = date.strftime("%d-%m-%Y")
-                else:
-                    issue_dict[key] = None
-            except ResourceAttrError:
-                issue_dict[key] = None
-
-        for field_id, name in {13: 'contract', 16: 'software_version', 18: 'stage'}.items():
-            try:
-                issue_dict[name] = issue.custom_fields.get(field_id).value
-            except (ResourceAttrError, AttributeError):
-                issue_dict[name] = None
+        issue_dict.update(get_date_fields(issue))
+        issue_dict.update(get_custom_fields(issue))
 
         time_entries_data = get_time_entries(issue, time_from, time_to)
 
@@ -162,6 +117,35 @@ def get_info(issues, time_from, time_to) -> list:
             issue_dict['real_hours'] = issue.spent_hours
             issues_info.append(issue_dict)
     return issues_info
+
+
+def get_date_fields(issue):
+    date_fields_data = {}
+    date_request = {'start_date': "issue.start_date", 'end_date': "issue.due_date"}
+
+    for key, value in date_request.items():
+        try:
+            date = eval(value)
+            if date:
+                date_fields_data[key] = date.strftime("%d-%m-%Y")
+            else:
+                date_fields_data[key] = None
+        except ResourceAttrError:
+            date_fields_data[key] = None
+
+    return date_fields_data
+
+
+def get_custom_fields(issue):
+    custom_fields_data = {}
+
+    for field_id, name in {13: 'contract', 16: 'software_version', 18: 'stage'}.items():
+        try:
+            custom_fields_data[name] = issue.custom_fields.get(field_id).value
+        except (ResourceAttrError, AttributeError):
+            custom_fields_data[name] = None
+
+    return custom_fields_data
 
 
 def get_time_entries(issue, time_from, time_to):
@@ -203,6 +187,7 @@ async def get_issues_info(time_from, time_to, **kwargs):
     try:
         issues_info = get_info(issues, time_from, time_to)
         create_xlsx_file(issues_info)
+        create_json_file(issues_info)
         return {'message': 'Issues info saved successfully'}
     except ResourceNotFoundError:
         return {'message': 'Issues not found'}

@@ -1,5 +1,5 @@
 .idea
 .env
-Issues info.xlsx
+xlsx_files
 logs.log
 test*
