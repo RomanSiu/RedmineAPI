@@ -112,10 +112,14 @@ def get_info(issues, time_from, time_to) -> list:
                 issue_dict.update(val)
                 issues_info.append(issue_dict.copy())
         else:
-            issue_dict['name'] = issue.assigned_to.name
-            issue_dict['user_id'] = issue.assigned_to.id
-            issue_dict['real_hours'] = issue.spent_hours
-            issues_info.append(issue_dict)
+            try:
+                issue_dict['name'] = issue.assigned_to.name
+                issue_dict['user_id'] = issue.assigned_to.id
+                issue_dict['real_hours'] = issue.spent_hours
+                issues_info.append(issue_dict)
+            except ResourceAttrError:
+                continue
+
     return issues_info
 
 
@@ -149,9 +153,6 @@ def get_custom_fields(issue):
 
 
 def get_time_entries(issue, time_from, time_to):
-    if not time_to:
-        time_to = datetime.now().date()
-
     time_entries_data_dict = []
     time_entries = issue.time_entries
 
@@ -181,6 +182,8 @@ async def get_issues_info(time_from, time_to, **kwargs):
         time_from = datetime(year=1970, month=1, day=1).date()
     if time_to:
         time_to = datetime.strptime(time_to, '%Y-%m-%d').date()
+    else:
+        time_to = datetime.now().date()
 
     issues = await get_issues_by_query(time_from, time_to, **kwargs)
 
