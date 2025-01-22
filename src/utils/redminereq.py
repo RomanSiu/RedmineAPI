@@ -12,7 +12,7 @@ from redminelib.exceptions import ResourceAttrError, ResourceNotFoundError
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Redmine configuration
-load_dotenv("src\.env")
+load_dotenv("RedmineAPI/src/.env")
 REDMINE_URL = os.getenv('REDMINE_URL')
 API_KEY = os.getenv('API_KEY')
 
