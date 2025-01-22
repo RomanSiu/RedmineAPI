@@ -2,7 +2,6 @@ import os
 import urllib3
 import json
 from datetime import datetime
-from collections import defaultdict
 
 from dotenv import load_dotenv
 from openpyxl import Workbook
@@ -13,7 +12,7 @@ from redminelib.exceptions import ResourceAttrError, ResourceNotFoundError
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Redmine configuration
-load_dotenv()
+load_dotenv("src/.env")
 REDMINE_URL = os.getenv('REDMINE_URL')
 API_KEY = os.getenv('API_KEY')
 
@@ -25,6 +24,7 @@ requests_dict = {'project_name': "issue.project.name", 'project_id': "issue.proj
 
 # Connect to Redmine
 try:
+    print(REDMINE_URL, API_KEY)
     redmine = Redmine(REDMINE_URL, key=API_KEY, requests={'verify': False})
 except Exception as e:
     print(f"Failed to connect to Redmine: {e}")

@@ -5,12 +5,10 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes.redmine_request import router as redmine_request_router
-from logger import logger
+from src.routes.redmine_request import router as redmine_request_router
 
 
 app = FastAPI()
-logger.info('Starting RedmineAPI')
 
 app.include_router(redmine_request_router, prefix="/api")
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
