@@ -3,6 +3,7 @@ import urllib3
 import json
 from datetime import datetime
 
+from fastapi.encoders import jsonable_encoder
 from dotenv import load_dotenv
 from openpyxl import Workbook
 from redminelib import Redmine
@@ -189,11 +190,12 @@ async def get_issues_info(time_from, time_to, **kwargs):
 
     try:
         issues_info = get_info(issues, time_from, time_to)
-        create_xlsx_file(issues_info)
+        # create_xlsx_file(issues_info)
         create_json_file(issues_info)
-        return {'message': 'Issues info saved successfully'}
+        data = jsonable_encoder(issues_info)
+        return {'message': 'Issues info saved successfully', 'data': data}
     except ResourceNotFoundError:
-        create_xlsx_file([])
+        # create_xlsx_file([])
         create_json_file([])
         return {'message': 'Issues not found'}
 
