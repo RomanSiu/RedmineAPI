@@ -193,6 +193,8 @@ async def get_issues_info(time_from, time_to, **kwargs):
         create_json_file(issues_info)
         return {'message': 'Issues info saved successfully'}
     except ResourceNotFoundError:
+        create_xlsx_file([])
+        create_json_file([])
         return {'message': 'Issues not found'}
 
 
