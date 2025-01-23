@@ -44,10 +44,10 @@ def logging_func(func):
     return inner
 
 
-async def get_issues_by_query(time_from, time_to, contract_num: str = None, project_stage: str | int = None):
+async def get_issues_by_query(time_from, time_to, project_id: str = None, project_stage: str | int = None):
     filter_kwargs = {'status_id': '*'}
-    if contract_num:
-        filter_kwargs['project_id'] = contract_num
+    if project_id:
+        filter_kwargs['project_id'] = project_id
     if project_stage:
         try:
             project_stage = int(project_stage)

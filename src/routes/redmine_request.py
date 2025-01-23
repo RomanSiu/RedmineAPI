@@ -12,9 +12,22 @@ FILE_PATH_JSON = Path("src/xlsx_files/Issues info.json")
 
 
 @router.get("/issues_info")
-async def issues_info(contract_num: str = None, project_stage: str | int = None,
+async def issues_info(project_id: str = None, project_stage: str | int = None,
                       time_from: str = None, time_to: str = None):
-    result = await get_issues_info(contract_num=contract_num, project_stage=project_stage,
+    """
+    Get issues info based on query paras.
+
+    - **project_id**: Id of project to get issues info for.
+    - **project_stage**: Stage of project to get issues info for.
+    - **time_from**: Start date to find issues.
+    - **time_to**: End date to find issues.
+
+    Return:
+
+    - **message**: Message request.
+    - **data**: Json response with issues info.
+    """
+    result = await get_issues_info(project_id=project_id, project_stage=project_stage,
                                    time_from=time_from, time_to=time_to)
 
     return JSONResponse(content=result)
@@ -34,6 +47,10 @@ async def issues_info(contract_num: str = None, project_stage: str | int = None,
 
 @router.get("/download_json", response_class=FileResponse)
 async def download_json():
+    """
+    Download json file to disk, by issues_info route.
+    :return:
+    """
     if not FILE_PATH_JSON.exists():
         return {"error": "Файл не знайдено"}
 
