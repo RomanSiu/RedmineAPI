@@ -153,6 +153,26 @@ def get_custom_fields(issue):
     return custom_fields_data
 
 
+def get_project_stages_contracts(project):
+    issues = project.issues
+    stages = []
+    contracts = []
+    for issue in issues:
+        try:
+            stage_name = issue.custom_fields.get(18).value
+            if stage_name not in stages and stage_name is not None:
+                stages.append(stage_name)
+        except (ResourceAttrError, AttributeError):
+            pass
+        try:
+            contract_name = issue.custom_fields.get(13).value
+            if contract_name not in contracts and contract_name not in ["", None]:
+                contracts.append(contract_name)
+        except (ResourceAttrError, AttributeError):
+            pass
+    return stages, contracts
+
+
 def get_time_entries(issue, time_from, time_to):
     time_entries_data_dict = []
     time_entries = issue.time_entries
@@ -174,6 +194,41 @@ def get_time_entries(issue, time_from, time_to):
             # time_entries_data_dict[name] = time_entries_data
 
     return time_entries_data_dict
+
+
+def get_trackers(project):
+    trackers = project.trackers
+    trackers_data = []
+    for tracker in trackers:
+        tracker_data = {}
+        try:
+            tracker_data['id'] = tracker.id
+        except AttributeError:
+            tracker_data['id'] = None
+        try:
+            tracker_data['name'] = tracker.name
+        except AttributeError:
+            tracker_data['name'] = None
+        trackers_data.append(tracker_data)
+    return trackers_data
+
+
+def get_project_info(project):
+    project_data = {}
+    project_data['id'] = project.id
+    project_data['name'] = project.name
+    project_data["trackers"] = get_trackers(project)
+    project_data['stages'], project_data['contracts'] = get_project_stages_contracts(project)
+    return project_data
+
+
+async def get_projects_directory():
+    projects = redmine.project.all()
+    projects_directory = []
+    for project in projects:
+        project_data = get_project_info(project)
+        projects_directory.append(project_data)
+    return projects_directory
 
 
 async def get_issues_info(time_from, time_to, **kwargs):
