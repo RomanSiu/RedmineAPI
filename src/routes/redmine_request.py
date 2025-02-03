@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import APIRouter
 from fastapi.responses import FileResponse, JSONResponse
 
-from src.utils.redminereq import get_issues_info, get_projects_directory
+from src.utils.redminereq import get_issues_info
 
 router = APIRouter(prefix="/redmine", tags=["redmine"])
 
@@ -19,8 +19,8 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
 
     - **project_id**: Id of project to get issues info for.
     - **project_stage**: Stage of project to get issues info for.
-    - **time_from**: Start date to find issues.
-    - **time_to**: End date to find issues.
+    - **time_from**: Start date to find issues. Format: YYYY-MM-DD.
+    - **time_to**: End date to find issues. Format: YYYY-MM-DD.
 
     Return:
 
@@ -29,13 +29,6 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
     """
     result = await get_issues_info(project_id=project_id, project_stage=project_stage,
                                    time_from=time_from, time_to=time_to)
-
-    return JSONResponse(content=result)
-
-
-@router.get("/projects_info")
-async def projects_info():
-    result = await get_projects_directory()
 
     return JSONResponse(content=result)
 

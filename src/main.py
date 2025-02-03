@@ -1,8 +1,6 @@
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.routes.redmine_request import router as redmine_request_router
@@ -11,7 +9,6 @@ from src.routes.redmine_request import router as redmine_request_router
 app = FastAPI()
 
 app.include_router(redmine_request_router, prefix="/api")
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,14 +19,9 @@ app.add_middleware(
 )
 
 
-templates = Jinja2Templates(directory="src/static/templates")
-
-
 @app.get("/", response_class=HTMLResponse)
-def read_root(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="main.html"
-    )
+def read_root():
+    return "Redmine API"
 
 
 if __name__ == '__main__':

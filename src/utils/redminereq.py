@@ -5,7 +5,6 @@ from datetime import datetime
 
 from fastapi.encoders import jsonable_encoder
 from dotenv import load_dotenv
-from openpyxl import Workbook
 from redminelib import Redmine
 from redminelib.exceptions import ResourceAttrError, ResourceNotFoundError
 
@@ -32,18 +31,6 @@ except Exception as e:
     exit()
 
 
-def logging_func(func):
-    def inner(*args, **kwargs):
-        try:
-            result = func(*args, **kwargs)
-        except Exception as e:
-            result = None
-        else:
-            return result
-        return result
-    return inner
-
-
 async def get_issues_by_query(time_from, time_to, project_id: str = None, project_stage: str | int = None):
     filter_kwargs = {'status_id': '*'}
     if project_id:
@@ -63,25 +50,25 @@ async def get_issues_by_query(time_from, time_to, project_id: str = None, projec
     return issues
 
 
-def create_xlsx_file(issues_list: list) -> None:
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Issues info"
-    ws.append(['ПІБ', 'Ідентифікатор спеціаліста', 'Проект', 'Ідентифікатор проекта', 'Договір', 'Етап', 'Версія',
-               'Версія ПО', 'Номер задачі', 'Трекер', 'Тема', 'Специфіка задачі', 'Дата початку', 'Дата завершення',
-               'Готовність', 'Діяльність', 'Планові працевитрати', 'Фактичні працевитрати'])
-    for issue in issues_list:
-        ws.append([issue['name'], issue['user_id'],
-                   issue['project_name'], issue['project_id'], issue['contract'], issue['stage'],
-                   issue['version'], issue['software_version'],
-                   issue['issue_id'], issue['issue_tracker'], issue['issue_subject'], '',
-                   issue['start_date'], issue['end_date'], issue['done_ratio'],
-                   issue['status'], issue['planned_hours'], issue['real_hours']])
-    output_file = r"src/xlsx_files/Issues info.xlsx"
-    try:
-        wb.save(output_file)
-    except Exception as e:
-        print(f"Failed to save xlsx file: {e}")
+# def create_xlsx_file(issues_list: list) -> None:
+#     wb = Workbook()
+#     ws = wb.active
+#     ws.title = "Issues info"
+#     ws.append(['ПІБ', 'Ідентифікатор спеціаліста', 'Проект', 'Ідентифікатор проекта', 'Договір', 'Етап', 'Версія',
+#                'Версія ПО', 'Номер задачі', 'Трекер', 'Тема', 'Специфіка задачі', 'Дата початку', 'Дата завершення',
+#                'Готовність', 'Діяльність', 'Планові працевитрати', 'Фактичні працевитрати'])
+#     for issue in issues_list:
+#         ws.append([issue['name'], issue['user_id'],
+#                    issue['project_name'], issue['project_id'], issue['contract'], issue['stage'],
+#                    issue['version'], issue['software_version'],
+#                    issue['issue_id'], issue['issue_tracker'], issue['issue_subject'], '',
+#                    issue['start_date'], issue['end_date'], issue['done_ratio'],
+#                    issue['status'], issue['planned_hours'], issue['real_hours']])
+#     output_file = r"src/xlsx_files/Issues info.xlsx"
+#     try:
+#         wb.save(output_file)
+#     except Exception as e:
+#         print(f"Failed to save xlsx file: {e}")
 
 
 def create_json_file(issues_list: list) -> None:
@@ -153,24 +140,24 @@ def get_custom_fields(issue):
     return custom_fields_data
 
 
-def get_project_stages_contracts(project):
-    issues = project.issues
-    stages = []
-    contracts = []
-    for issue in issues:
-        try:
-            stage_name = issue.custom_fields.get(18).value
-            if stage_name not in stages and stage_name is not None:
-                stages.append(stage_name)
-        except (ResourceAttrError, AttributeError):
-            pass
-        try:
-            contract_name = issue.custom_fields.get(13).value
-            if contract_name not in contracts and contract_name not in ["", None]:
-                contracts.append(contract_name)
-        except (ResourceAttrError, AttributeError):
-            pass
-    return stages, contracts
+# def get_project_stages_contracts(project):
+#     issues = project.issues
+#     stages = []
+#     contracts = []
+#     for issue in issues:
+#         try:
+#             stage_name = issue.custom_fields.get(18).value
+#             if stage_name not in stages and stage_name is not None:
+#                 stages.append(stage_name)
+#         except (ResourceAttrError, AttributeError):
+#             pass
+#         try:
+#             contract_name = issue.custom_fields.get(13).value
+#             if contract_name not in contracts and contract_name not in ["", None]:
+#                 contracts.append(contract_name)
+#         except (ResourceAttrError, AttributeError):
+#             pass
+#     return stages, contracts
 
 
 def get_time_entries(issue, time_from, time_to):
@@ -196,39 +183,39 @@ def get_time_entries(issue, time_from, time_to):
     return time_entries_data_dict
 
 
-def get_trackers(project):
-    trackers = project.trackers
-    trackers_data = []
-    for tracker in trackers:
-        tracker_data = {}
-        try:
-            tracker_data['id'] = tracker.id
-        except AttributeError:
-            tracker_data['id'] = None
-        try:
-            tracker_data['name'] = tracker.name
-        except AttributeError:
-            tracker_data['name'] = None
-        trackers_data.append(tracker_data)
-    return trackers_data
+# def get_trackers(project):
+#     trackers = project.trackers
+#     trackers_data = []
+#     for tracker in trackers:
+#         tracker_data = {}
+#         try:
+#             tracker_data['id'] = tracker.id
+#         except AttributeError:
+#             tracker_data['id'] = None
+#         try:
+#             tracker_data['name'] = tracker.name
+#         except AttributeError:
+#             tracker_data['name'] = None
+#         trackers_data.append(tracker_data)
+#     return trackers_data
 
 
-def get_project_info(project):
-    project_data = {}
-    project_data['id'] = project.id
-    project_data['name'] = project.name
-    project_data["trackers"] = get_trackers(project)
-    project_data['stages'], project_data['contracts'] = get_project_stages_contracts(project)
-    return project_data
+# def get_project_info(project):
+#     project_data = {}
+#     project_data['id'] = project.id
+#     project_data['name'] = project.name
+#     project_data["trackers"] = get_trackers(project)
+#     project_data['stages'], project_data['contracts'] = get_project_stages_contracts(project)
+#     return project_data
 
 
-async def get_projects_directory():
-    projects = redmine.project.all()
-    projects_directory = []
-    for project in projects:
-        project_data = get_project_info(project)
-        projects_directory.append(project_data)
-    return projects_directory
+# async def get_projects_directory():
+#     projects = redmine.project.all()
+#     projects_directory = []
+#     for project in projects:
+#         project_data = get_project_info(project)
+#         projects_directory.append(project_data)
+#     return projects_directory
 
 
 async def get_issues_info(time_from, time_to, **kwargs):
