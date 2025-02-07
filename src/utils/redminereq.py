@@ -104,6 +104,7 @@ def get_info(issues, time_from, time_to) -> list:
                 issue_dict['name'] = issue.assigned_to.name
                 issue_dict['user_id'] = issue.assigned_to.id
                 issue_dict['real_hours'] = issue.spent_hours
+                issue_dict['updated_date'] = issue.updated_on.strftime("%d-%m-%Y")
                 issues_info.append(issue_dict)
             except ResourceAttrError:
                 continue
@@ -168,9 +169,11 @@ def get_time_entries(issue, time_from, time_to):
         if time_from <= time_entry.created_on.date() <= time_to:
             time_entries_data = {}
             name, user_id = time_entry.user.name, time_entry.user.id
+            time_entries_data['time_entry_id'] = time_entry.id
             time_entries_data['name'] = name
             time_entries_data['user_id'] = user_id
             time_entries_data['real_hours'] = time_entry.hours
+            time_entries_data['updated_data'] = time_entry.updated_on.strftime("%d-%m-%Y")
             time_entries_data_dict.append(time_entries_data)
             # if name not in time_entries_data_dict:
             #     time_entries_data_dict[name] = {'real_hours': 0}
