@@ -101,6 +101,9 @@ def get_info(issues, time_from, time_to) -> list:
                 issues_info.append(issue_dict.copy())
         else:
             try:
+                time_entries = issue.time_entries
+                if time_entries:
+                    continue
                 issue_dict['name'] = issue.assigned_to.name
                 issue_dict['user_id'] = issue.assigned_to.id
                 issue_dict['real_hours'] = issue.spent_hours
