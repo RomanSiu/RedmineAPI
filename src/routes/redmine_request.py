@@ -1,7 +1,8 @@
 from pathlib import Path
+import json
 
 from fastapi import APIRouter
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from src.utils.redminereq import get_issues_info
 
@@ -27,10 +28,21 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
     - **message**: Message request.
     - **data**: Json response with issues info.
     """
-    result = await get_issues_info(project_id=project_id, project_stage=project_stage,
-                                   time_from=time_from, time_to=time_to)
+    # result = await get_issues_info(project_id=project_id, project_stage=project_stage,
+    #                                time_from=time_from, time_to=time_to)
+    #
+    # return JSONResponse(content=result)
 
-    return JSONResponse(content=result)
+    return StreamingResponse(json_streamer(project_id=project_id, project_stage=project_stage,
+                                           time_from=time_from, time_to=time_to), media_type="application/json")
+
+
+async def json_streamer(**kwargs):
+    result = await get_issues_info(**kwargs)
+
+    for i in result['data']:
+        json_str = json.dumps(i, ensure_ascii=False, indent=4)
+        yield json_str
 
 
 # @router.get("/download_excel", response_class=FileResponse)
