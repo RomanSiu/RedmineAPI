@@ -1,7 +1,8 @@
+import json
 from pathlib import Path
 
 from fastapi import APIRouter
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from src.utils.redminereq import get_issues_info
 
@@ -12,8 +13,8 @@ FILE_PATH_JSON = Path("src/xlsx_files/Issues info.json")
 
 
 @router.get("/issues_info")
-def issues_info(project_id: str = None, project_stage: str | int = None,
-                time_from: str = None, time_to: str = None):
+async def issues_info(project_id: str = None, project_stage: str | int = None,
+                      time_from: str = None, time_to: str = None):
     """
     Get issues info based on query paras.
 
@@ -27,10 +28,22 @@ def issues_info(project_id: str = None, project_stage: str | int = None,
     - **message**: Message request.
     - **data**: Json response with issues info.
     """
-    result = get_issues_info(project_id=project_id, project_stage=project_stage,
-                             time_from=time_from, time_to=time_to)
+    result = await get_issues_info(project_id=project_id, project_stage=project_stage,
+                                   time_from=time_from, time_to=time_to)
 
-    return JSONResponse(content=result)
+    async def json_streamer(result):
+        yield "["
+        first = True
+        for i in result['data']:
+            if not first:
+                yield ","
+            yield json.dumps(i, ensure_ascii=False, indent=4)
+            first = False
+        yield "]"
+
+    # return JSONResponse(content=result)
+    return StreamingResponse(json_streamer(result), media_type="application/json")
+
 
 
 # @router.get("/download_excel", response_class=FileResponse)

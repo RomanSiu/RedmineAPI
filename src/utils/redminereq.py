@@ -31,7 +31,7 @@ except Exception as e:
     exit()
 
 
-def get_issues_by_query(time_from, time_to, project_id: str = None, project_stage: str | int = None):
+async def get_issues_by_query(time_from, time_to, project_id: str = None, project_stage: str | int = None):
     filter_kwargs = {'status_id': '*'}
     if project_id:
         filter_kwargs['project_id'] = project_id
@@ -47,7 +47,6 @@ def get_issues_by_query(time_from, time_to, project_id: str = None, project_stag
         issues = redmine.issue.filter(**filter_kwargs)
     else:
         issues = redmine.issue.all()
-
     return issues
 
 
@@ -226,7 +225,7 @@ def get_time_entries(issue, time_from, time_to):
 #     return projects_directory
 
 
-def get_issues_info(time_from, time_to, **kwargs):
+async def get_issues_info(time_from, time_to, **kwargs):
     if time_from:
         time_from = datetime.strptime(time_from, '%Y-%m-%d').date()
     else:
@@ -236,7 +235,7 @@ def get_issues_info(time_from, time_to, **kwargs):
     else:
         time_to = datetime.now().date()
 
-    issues = get_issues_by_query(time_from, time_to, **kwargs)
+    issues = await get_issues_by_query(time_from, time_to, **kwargs)
 
     try:
         issues_info = get_info(issues, time_from, time_to)
