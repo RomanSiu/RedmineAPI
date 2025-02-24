@@ -1,12 +1,14 @@
 import httpx
 
-url = "http://172.16.4.6:8000/api/redmine/issues_info?time_from=2025-01-01"
+url = "http://127.0.0.1:8000/api/redmine/issues_info?time_from=2025-01-01"
 
-response = httpx.get(url)
+try:
+    response = httpx.get(url, timeout=10)
+    response.raise_for_status()  # Викличе помилку, якщо статус не 2xx
 
-if response.status_code == 200:
     print("Успішний запит!")
     print(response.json())  # Виведе JSON-відповідь
-else:
-    print(f"Помилка: {response.status_code}")
-    print(response.text)  # Виведе текст помилки, якщо є
+except httpx.RequestError as exc:
+    print(f"Помилка запиту: {exc}")
+except httpx.HTTPStatusError as exc:
+    print(f"Помилка статусу: {exc.response.status_code} - {exc.response.text}")
