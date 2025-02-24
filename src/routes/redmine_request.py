@@ -30,7 +30,8 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
     result = await get_issues_info(project_id=project_id, project_stage=project_stage,
                                    time_from=time_from, time_to=time_to)
 
-    return JSONResponse(content=result)
+    # return JSONResponse(content=result)
+    return "Hello World!"
 
 
 # @router.get("/download_excel", response_class=FileResponse)
