@@ -1,6 +1,6 @@
 import httpx
 
-url = "http://127.0.0.1:8000/api/redmine/issues_info?time_from=2025-01-01"
+url = "http://172.16.4.6:8000/api/redmine/issues_info?time_from=2025-01-01"
 
 try:
     response = httpx.get(url, timeout=10)
