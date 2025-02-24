@@ -12,8 +12,8 @@ FILE_PATH_JSON = Path("src/xlsx_files/Issues info.json")
 
 
 @router.get("/issues_info")
-async def issues_info(project_id: str = None, project_stage: str | int = None,
-                      time_from: str = None, time_to: str = None):
+def issues_info(project_id: str = None, project_stage: str | int = None,
+                time_from: str = None, time_to: str = None):
     """
     Get issues info based on query paras.
 
@@ -27,11 +27,10 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
     - **message**: Message request.
     - **data**: Json response with issues info.
     """
-    result = await get_issues_info(project_id=project_id, project_stage=project_stage,
-                                   time_from=time_from, time_to=time_to)
+    result = get_issues_info(project_id=project_id, project_stage=project_stage,
+                             time_from=time_from, time_to=time_to)
 
-    # return JSONResponse(content=result)
-    return "Hello World!"
+    return JSONResponse(content=result)
 
 
 # @router.get("/download_excel", response_class=FileResponse)
