@@ -1,5 +1,3 @@
-import json
-import gzip
 from pathlib import Path
 
 from fastapi import APIRouter
@@ -32,21 +30,7 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
     result = await get_issues_info(project_id=project_id, project_stage=project_stage,
                                    time_from=time_from, time_to=time_to)
 
-    # async def json_streamer(result):
-    #     yield "["
-    #     first = True
-    #     for i in result['data']:
-    #         if not first:
-    #             yield ","
-    #         yield json.dumps(i, ensure_ascii=False, indent=4)
-    #         first = False
-    #     yield "]"
-    #
-    # return StreamingResponse(json_streamer(result), media_type="application/json")
     return JSONResponse(content=result)
-    # with open("src/xlsx_files/Issues info.json", "rb") as f:
-    #     compressed_data = gzip.compress(f.read())
-    # return Response(content=compressed_data, media_type="application/json", headers={"Content-Encoding": "gzip"})
 
 
 # @router.get("/download_excel", response_class=FileResponse)
