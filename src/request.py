@@ -3,7 +3,7 @@ import httpx
 url = "http://172.16.4.6:8000/api/redmine/issues_info?time_from=2025-01-01"
 
 try:
-    response = httpx.get(url, timeout=10)
+    response = httpx.get(url, timeout=30)
     response.raise_for_status()  # Викличе помилку, якщо статус не 2xx
 
     print("Успішний запит!")

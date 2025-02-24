@@ -135,7 +135,7 @@ def get_date_fields(issue):
 def get_custom_fields(issue):
     custom_fields_data = {}
 
-    for field_id, name in {13: 'contract', 16: 'software_version', 18: 'stage'}.items():
+    for field_id, name in {13: 'contract', 16: 'software_version', 18: 'stage', 19: 'issue_type'}.items():
         try:
             custom_fields_data[name] = issue.custom_fields.get(field_id).value
         except (ResourceAttrError, AttributeError):
@@ -144,85 +144,24 @@ def get_custom_fields(issue):
     return custom_fields_data
 
 
-# def get_project_stages_contracts(project):
-#     issues = project.issues
-#     stages = []
-#     contracts = []
-#     for issue in issues:
-#         try:
-#             stage_name = issue.custom_fields.get(18).value
-#             if stage_name not in stages and stage_name is not None:
-#                 stages.append(stage_name)
-#         except (ResourceAttrError, AttributeError):
-#             pass
-#         try:
-#             contract_name = issue.custom_fields.get(13).value
-#             if contract_name not in contracts and contract_name not in ["", None]:
-#                 contracts.append(contract_name)
-#         except (ResourceAttrError, AttributeError):
-#             pass
-#     return stages, contracts
-
-
 def get_time_entries(issue, time_from, time_to):
     time_entries_data_dict = []
     time_entries = issue.time_entries
 
     for time_entry in time_entries:
-        if time_from <= time_entry.created_on.date() <= time_to:
+        if time_from <= time_entry.updated_on.date() <= time_to:
             time_entries_data = {}
             name, user_id = time_entry.user.name, time_entry.user.id
             time_entries_data['time_entry_id'] = time_entry.id
             time_entries_data['name'] = name
             time_entries_data['user_id'] = user_id
+            time_entries_data['activity'] = time_entry.activity.name
             time_entries_data['real_hours'] = time_entry.hours
             time_entries_data['time_entry_date'] = time_entry.created_on.strftime("%d-%m-%Y")
             time_entries_data['updated_data'] = time_entry.updated_on.strftime("%d-%m-%Y")
             time_entries_data_dict.append(time_entries_data)
-            # if name not in time_entries_data_dict:
-            #     time_entries_data_dict[name] = {'real_hours': 0}
-            # time_entries_data = time_entries_data_dict[name]
-            # time_entries_data['name'] = name
-            # time_entries_data['user_id'] = user_id
-            # time_entries_data['real_hours'] += time_entry.hours
-            # time_entries_data_dict[name] = time_entries_data
 
     return time_entries_data_dict
-
-
-# def get_trackers(project):
-#     trackers = project.trackers
-#     trackers_data = []
-#     for tracker in trackers:
-#         tracker_data = {}
-#         try:
-#             tracker_data['id'] = tracker.id
-#         except AttributeError:
-#             tracker_data['id'] = None
-#         try:
-#             tracker_data['name'] = tracker.name
-#         except AttributeError:
-#             tracker_data['name'] = None
-#         trackers_data.append(tracker_data)
-#     return trackers_data
-
-
-# def get_project_info(project):
-#     project_data = {}
-#     project_data['id'] = project.id
-#     project_data['name'] = project.name
-#     project_data["trackers"] = get_trackers(project)
-#     project_data['stages'], project_data['contracts'] = get_project_stages_contracts(project)
-#     return project_data
-
-
-# async def get_projects_directory():
-#     projects = redmine.project.all()
-#     projects_directory = []
-#     for project in projects:
-#         project_data = get_project_info(project)
-#         projects_directory.append(project_data)
-#     return projects_directory
 
 
 async def get_issues_info(time_from, time_to, **kwargs):
