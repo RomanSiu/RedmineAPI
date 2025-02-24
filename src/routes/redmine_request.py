@@ -31,19 +31,18 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
     result = await get_issues_info(project_id=project_id, project_stage=project_stage,
                                    time_from=time_from, time_to=time_to)
 
-    async def json_streamer(result):
-        yield "["
-        first = True
-        for i in result['data']:
-            if not first:
-                yield ","
-            yield json.dumps(i, ensure_ascii=False, indent=4)
-            first = False
-        yield "]"
-
-    # return JSONResponse(content=result)
-    return StreamingResponse(json_streamer(result), media_type="application/json")
-
+    # async def json_streamer(result):
+    #     yield "["
+    #     first = True
+    #     for i in result['data']:
+    #         if not first:
+    #             yield ","
+    #         yield json.dumps(i, ensure_ascii=False, indent=4)
+    #         first = False
+    #     yield "]"
+    #
+    # return StreamingResponse(json_streamer(result), media_type="application/json")
+    return JSONResponse(content=result)
 
 
 # @router.get("/download_excel", response_class=FileResponse)
