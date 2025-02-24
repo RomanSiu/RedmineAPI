@@ -43,10 +43,10 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
     #     yield "]"
     #
     # return StreamingResponse(json_streamer(result), media_type="application/json")
-    # return JSONResponse(content=result)
-    with open("src/xlsx_files/Issues info.json", "rb") as f:
-        compressed_data = gzip.compress(f.read())
-    return Response(content=compressed_data, media_type="application/json", headers={"Content-Encoding": "gzip"})
+    return JSONResponse(content=result)
+    # with open("src/xlsx_files/Issues info.json", "rb") as f:
+    #     compressed_data = gzip.compress(f.read())
+    # return Response(content=compressed_data, media_type="application/json", headers={"Content-Encoding": "gzip"})
 
 
 # @router.get("/download_excel", response_class=FileResponse)
