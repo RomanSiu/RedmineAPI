@@ -47,6 +47,7 @@ def get_issues_by_query(time_from, time_to, project_id: str = None, project_stag
         issues = redmine.issue.filter(**filter_kwargs)
     else:
         issues = redmine.issue.all()
+
     return issues
 
 
