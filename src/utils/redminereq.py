@@ -135,7 +135,8 @@ def get_date_fields(issue):
 def get_custom_fields(issue):
     custom_fields_data = {}
 
-    for field_id, name in {13: 'contract', 16: 'software_version', 18: 'stage', 19: 'issue_type'}.items():
+    for field_id, name in {13: 'contract', 16: 'software_version', 18: 'stage', 19: 'issue_type',
+                           20: 'error_reason'}.items():
         try:
             custom_fields_data[name] = issue.custom_fields.get(field_id).value
         except (ResourceAttrError, AttributeError):
