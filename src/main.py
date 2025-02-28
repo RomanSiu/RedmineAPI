@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.routes.redmine_request import router as redmine_request_router
 
 
-app = FastAPI()
+app = FastAPI(swagger_ui_parameters={'syntaxHighlight': False})
 
 app.include_router(redmine_request_router, prefix="/api")
 
