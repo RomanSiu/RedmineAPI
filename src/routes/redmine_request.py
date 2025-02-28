@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse, Response
 
 from src.utils.redminereq import get_issues_info
+from src.utils.catalogs import get_catalog_type_activity
 
 router = APIRouter(prefix="/redmine", tags=["redmine"])
 
@@ -29,6 +30,13 @@ async def issues_info(project_id: str = None, project_stage: str | int = None,
     """
     result = await get_issues_info(project_id=project_id, project_stage=project_stage,
                                    time_from=time_from, time_to=time_to)
+
+    return JSONResponse(content=result)
+
+
+@router.get("/catalog/activity_type")
+def get_activity_type_catalog():
+    result = get_catalog_type_activity()
 
     return JSONResponse(content=result)
 
