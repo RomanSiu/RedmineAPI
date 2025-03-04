@@ -158,7 +158,7 @@ def get_time_entries(issue, time_from, time_to):
             time_entries_data['user_id'] = user_id
             time_entries_data['activity'] = time_entry.activity.name
             time_entries_data['real_hours'] = time_entry.hours
-            time_entries_data['time_entry_date'] = time_entry.created_on.strftime("%d-%m-%Y")
+            time_entries_data['time_entry_date'] = time_entry.spent_on.strftime("%d-%m-%Y")
             time_entries_data['updated_data'] = time_entry.updated_on.strftime("%d-%m-%Y")
             time_entries_data_dict.append(time_entries_data)
 
