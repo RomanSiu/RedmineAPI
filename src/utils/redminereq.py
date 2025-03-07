@@ -150,17 +150,17 @@ def get_time_entries(issue, time_from, time_to):
     time_entries = issue.time_entries
 
     for time_entry in time_entries:
-        # if time_from <= time_entry.updated_on.date() <= time_to:
-        time_entries_data = {}
-        name, user_id = time_entry.user.name, time_entry.user.id
-        time_entries_data['time_entry_id'] = time_entry.id
-        time_entries_data['name'] = name
-        time_entries_data['user_id'] = user_id
-        time_entries_data['activity'] = time_entry.activity.name
-        time_entries_data['real_hours'] = time_entry.hours
-        time_entries_data['time_entry_date'] = time_entry.spent_on.strftime("%d-%m-%Y")
-        time_entries_data['updated_data'] = time_entry.updated_on.strftime("%d-%m-%Y")
-        time_entries_data_dict.append(time_entries_data)
+        if time_from <= time_entry.updated_on.date() <= time_to:
+            time_entries_data = {}
+            name, user_id = time_entry.user.name, time_entry.user.id
+            time_entries_data['time_entry_id'] = time_entry.id
+            time_entries_data['name'] = name
+            time_entries_data['user_id'] = user_id
+            time_entries_data['activity'] = time_entry.activity.name
+            time_entries_data['real_hours'] = time_entry.hours
+            time_entries_data['time_entry_date'] = time_entry.spent_on.strftime("%d-%m-%Y")
+            time_entries_data['updated_data'] = time_entry.updated_on.strftime("%d-%m-%Y")
+            time_entries_data_dict.append(time_entries_data)
 
     return time_entries_data_dict
 
