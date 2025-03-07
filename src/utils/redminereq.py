@@ -109,6 +109,8 @@ def get_info(issues, time_from, time_to) -> list:
                 issue_dict['updated_date'] = issue.updated_on.strftime("%d-%m-%Y")
                 if issue.updated_on.date() > time_to:
                     continue
+                elif issue_dict['real_hours'] == 0:
+                    continue
                 issues_info.append(issue_dict)
             except ResourceAttrError:
                 continue
@@ -161,6 +163,8 @@ def get_time_entries(issue, time_from, time_to):
             time_entries_data['real_hours'] = time_entry.hours
             time_entries_data['time_entry_date'] = time_entry.spent_on.strftime("%d-%m-%Y")
             time_entries_data['updated_data'] = time_entry.updated_on.strftime("%d-%m-%Y")
+            if time_entries_data['real_hours'] == 0:
+                continue
             time_entries_data_dict.append(time_entries_data)
 
     return time_entries_data_dict
