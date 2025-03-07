@@ -32,7 +32,6 @@ except Exception as e:
 
 
 async def get_issues_by_query(time_from, time_to, project_id: str = None, project_stage: str | int = None):
-    time_to = datetime.now().date()
     filter_kwargs = {'status_id': '*'}
     if project_id:
         filter_kwargs['project_id'] = project_id
@@ -42,8 +41,7 @@ async def get_issues_by_query(time_from, time_to, project_id: str = None, projec
         except ValueError:
             pass
         filter_kwargs['cf_18'] = project_stage
-    # filter_kwargs['updated_on'] = f"><{time_from}|{time_to if time_to else ''}"
-    filter_kwargs['updated_on'] = f"><{time_from}|{time_to}"
+    filter_kwargs['updated_on'] = f"><{time_from}|{time_to if time_to else ''}"
 
     if filter_kwargs:
         issues = redmine.issue.filter(**filter_kwargs)
@@ -110,8 +108,6 @@ def get_info(issues, time_from, time_to) -> list:
                 issue_dict['user_id'] = issue.assigned_to.id
                 issue_dict['real_hours'] = issue.spent_hours
                 issue_dict['updated_date'] = issue.updated_on.strftime("%d-%m-%Y")
-                if issue.updated_on.date() > time_to:
-                    continue
                 issues_info.append(issue_dict)
             except ResourceAttrError:
                 continue
