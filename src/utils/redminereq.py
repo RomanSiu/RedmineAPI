@@ -99,21 +99,20 @@ def get_info(issues, time_from, time_to) -> list:
                 issue_dict.update(val)
                 issues_info.append(issue_dict.copy())
         else:
-            try:
-                time_entries = issue.time_entries
-                if time_entries:
-                    continue
-                issue_dict['name'] = issue.assigned_to.name
-                issue_dict['user_id'] = issue.assigned_to.id
-                issue_dict['real_hours'] = issue.spent_hours
-                issue_dict['updated_date'] = issue.updated_on.strftime("%d-%m-%Y")
-                if issue.updated_on.date() > time_to:
-                    continue
-                elif issue_dict['real_hours'] == 0:
-                    continue
-                issues_info.append(issue_dict)
-            except ResourceAttrError:
-                continue
+            # try:
+            #     time_entries = issue.time_entries
+            #     issue_dict['name'] = issue.assigned_to.name
+            #     issue_dict['user_id'] = issue.assigned_to.id
+            #     issue_dict['real_hours'] = issue.spent_hours
+            #     issue_dict['updated_date'] = issue.updated_on.strftime("%d-%m-%Y")
+            #     if issue.updated_on.date() > time_to:
+            #         continue
+            #     if issue_dict['real_hours'] == 0:
+            #         continue
+            #     issues_info.append(issue_dict)
+            # except ResourceAttrError:
+            #     continue
+            continue
 
     return issues_info
 
